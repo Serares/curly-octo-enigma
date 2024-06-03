@@ -7,6 +7,7 @@ package db
 
 import (
 	"context"
+	"time"
 )
 
 const createAnswer = `-- name: CreateAnswer :exec
@@ -28,8 +29,8 @@ type CreateAnswerParams struct {
 	Content    string
 	Upvotes    int64
 	Downvotes  int64
-	CreatedAt  int64
-	UpdatedAt  int64
+	CreatedAt  time.Time
+	UpdatedAt  time.Time
 }
 
 func (q *Queries) CreateAnswer(ctx context.Context, arg CreateAnswerParams) error {

@@ -126,8 +126,8 @@ type GetQuestionWithAnswersRow struct {
 	Content     sql.NullString
 	Upvotes_2   sql.NullInt64
 	Downvotes_2 sql.NullInt64
-	CreatedAt_2 sql.NullInt64
-	UpdatedAt_2 sql.NullInt64
+	CreatedAt_2 sql.NullTime
+	UpdatedAt_2 sql.NullTime
 }
 
 func (q *Queries) GetQuestionWithAnswers(ctx context.Context, id string) ([]GetQuestionWithAnswersRow, error) {

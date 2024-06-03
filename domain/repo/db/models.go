@@ -14,8 +14,8 @@ type Answer struct {
 	Content    string
 	Upvotes    int64
 	Downvotes  int64
-	CreatedAt  int64
-	UpdatedAt  int64
+	CreatedAt  time.Time
+	UpdatedAt  time.Time
 }
 
 type Question struct {

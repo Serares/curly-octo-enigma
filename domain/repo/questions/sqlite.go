@@ -91,7 +91,20 @@ func (s *SqliteQuestionsRepository) FindQuestionById(ctx context.Context, id str
 }
 
 func (s *SqliteQuestionsRepository) CreateQuestion(question *dto.QuestionDTO) error {
-	return errors.New("Not implemented")
+	params := db.CreateQuestionParams{
+		ID:        question.Question.ID,
+		CreatedAt: time.Now().UTC(),
+		UpdatedAt: time.Now().UTC(),
+		UserSub:   question.User_ID,
+		Title:     question.Question.Title,
+		Body:      question.Question.Body,
+		UserEmail: question.Question.UserEmail,
+		UserName:  question.Question.UserName,
+		Upvotes:   0,
+		Downvotes: 0,
+	}
+
+	return s.db.CreateQuestion(context.Background(), params)
 }
 
 func (s *SqliteQuestionsRepository) UpdateQuestion(question *dto.QuestionDTO) error {
@@ -104,8 +117,17 @@ func (s *SqliteQuestionsRepository) DeleteQuestionById(id string) error {
 
 // answers
 
-func (s *SqliteQuestionsRepository) AddAnswer(questionId string, answerParams dto.AnswerDTO) error {
-	return errors.New("Not implemented")
+func (s *SqliteQuestionsRepository) AddAnswer(questionId string, answerParams *dto.AnswerDTO) error {
+	dbParams := db.CreateAnswerParams{
+		ID:         answerParams.Id,
+		CreatedAt:  time.Now().UTC(),
+		UpdatedAt:  time.Now().UTC(),
+		QuestionID: questionId,
+		Content:    answerParams.Content,
+		Upvotes:    0,
+		Downvotes:  0,
+	}
+	return s.db.CreateAnswer(context.Background(), dbParams)
 }
 
 func (s *SqliteQuestionsRepository) RemoveAnswer(questionId string, answerId string) error {
