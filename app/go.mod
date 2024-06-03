@@ -3,6 +3,7 @@ module github.com/Serares/curly-octo-enigma/app
 go 1.22.0
 
 require (
+	github.com/Serares/curly-octo-enigma/domain/repo v0.0.0-00010101000000-000000000000
 	github.com/a-h/templ v0.2.707
 	github.com/akrylysov/algnhsa v1.1.0
 	github.com/coreos/go-oidc v2.2.1+incompatible

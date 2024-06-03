@@ -3,11 +3,11 @@ package dto
 import "time"
 
 type AnswerDTO struct {
-	Id         string
-	QuestionId string
-	Content    string
-	Upvotes    int64
-	Downvotes  int64
-	CreatedAt  time.Time
-	UpdatedAt  time.Time
+	Id         string    `json:"id"`
+	QuestionId string    `json:"questionId"`
+	Content    string    `json:"content"`
+	Upvotes    int64     `json:"upvotes"`
+	Downvotes  int64     `json:"downvotes"`
+	CreatedAt  time.Time `json:"createdAt"`
+	UpdatedAt  time.Time `json:"updatedAt"`
 }

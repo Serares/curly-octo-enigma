@@ -16,7 +16,7 @@ type AuthHandler struct {
 
 func NewAuthHandler(logger *slog.Logger, service *services.AuthService) *AuthHandler {
 	return &AuthHandler{
-		Logger:      logger,
+		Logger:      logger.WithGroup("Auth Handler"),
 		AuthService: service,
 	}
 }

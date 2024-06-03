@@ -20,7 +20,7 @@ func NewAuthService(
 	oidcP *oidc.Provider,
 ) *AuthService {
 	return &AuthService{
-		Logger:    logger,
+		Logger:    logger.WithGroup("Auth Service"),
 		Oauth2Cfg: oauth2,
 		OidcP:     oidcP,
 	}

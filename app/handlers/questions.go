@@ -19,7 +19,7 @@ func NewQuestionsHandler(
 	client *client.APIClient,
 ) *QuestionsHandler {
 	return &QuestionsHandler{
-		Logger: logger,
+		Logger: logger.WithGroup("Questions Handler"),
 		Client: client,
 	}
 }

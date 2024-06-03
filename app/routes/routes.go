@@ -49,26 +49,30 @@ func Mux(log *slog.Logger) *http.ServeMux {
 	// views
 	m.Handle("GET /login", authHandler)
 	m.Handle("GET /callback", authHandler)
+	// get all questions
 	m.Handle("GET /questions",
 		middleware.NewMiddleware(
 			qHandler,
 			middleware.WithSecure(false),
-		)) // get all questions
+		))
+	// single question by id
 	m.Handle("GET /questions/{slug}",
 		middleware.NewMiddleware(
 			qHandler,
 			middleware.WithSecure(false),
-		)) // get question by id
+		))
+	// add a question
 	m.Handle("POST /questions",
 		middleware.NewMiddleware(
 			qHandler,
 			middleware.WithSecure(false),
-		)) // create a question
+		))
+	// create a answer for a question
 	m.Handle("POST /answers/{questionId}",
 		middleware.NewMiddleware(
 			qHandler,
 			middleware.WithSecure(false),
-		)) // create a answer for a question
+		))
 	// m.Handle("GET /")
 	m.Handle("GET /", middleware.NewMiddleware(
 		qHandler,
