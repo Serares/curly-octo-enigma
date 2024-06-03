@@ -14,7 +14,7 @@ import (
 
 func main() {
 	// used for local testing
-	err := godotenv.Load(".env.dev")
+	err := godotenv.Load(".env.local")
 	if err != nil {
 		log.Fatal("error loading the .env file")
 	}

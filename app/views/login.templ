@@ -1,0 +1,17 @@
+package views
+
+type LoginProps struct {
+	AuthUrl      string
+	ErrorMessage string
+}
+
+templ Login(props LoginProps) {
+	<div>
+		if props.ErrorMessage != "" {
+			<div>Error trying to login</div>
+		}
+		<a href={ templ.SafeURL(props.AuthUrl) }>
+			Login with Google account
+		</a>
+	</div>
+}
