@@ -8,7 +8,7 @@ import (
 
 type QuestionsRepostiroy interface {
 	// questions
-	FindAllQuestions(ctx context.Context) ([]dto.QuestionDTO, error)
+	ListAllQuestions(ctx context.Context, limit int64, offset int64) ([]dto.QuestionDTO, error)
 	FindQuestionById(ctx context.Context, id string) (dto.QuestionDTO, error)
 	CreateQuestion(ctx context.Context, question *dto.QuestionDTO) (dto.QuestionDTO, error)
 	UpdateQuestion(ctx context.Context, question *dto.QuestionDTO) (dto.QuestionDTO, error)

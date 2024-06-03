@@ -42,7 +42,8 @@ func NewSqliteQuestionsRepository() (*SqliteQuestionsRepository, error) {
 	}, nil
 }
 
-func (s *SqliteQuestionsRepository) FindAllQuestions(ctx context.Context) ([]dto.QuestionDTO, error) {
+func (s *SqliteQuestionsRepository) ListAllQuestions(ctx context.Context, limit int64, offset int64) ([]dto.QuestionDTO, error) {
+	// should be a lean dto object
 	return nil, errors.New("Not implemented")
 }
 
