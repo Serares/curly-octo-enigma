@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/Serares/curly-octo-enigma/app/client"
 	"github.com/Serares/curly-octo-enigma/app/handlers"
 	"github.com/Serares/curly-octo-enigma/app/middleware"
 	"github.com/Serares/curly-octo-enigma/app/services"
@@ -39,22 +40,39 @@ func Mux(log *slog.Logger) *http.ServeMux {
 		oidcP,
 	)
 
+	apiClient := client.NewApiClient()
+
 	m := http.NewServeMux()
 
-	qHandler := handlers.NewQuestionsHandler(log)
+	qHandler := handlers.NewQuestionsHandler(log, apiClient)
 	authHandler := handlers.NewAuthHandler(log, authService)
 	// views
-	m.Handle("GET /auth/login", authHandler)
-	m.Handle("GET /auth/callback", authHandler)
+	m.Handle("GET /login", authHandler)
+	m.Handle("GET /callback", authHandler)
 	m.Handle("GET /questions",
 		middleware.NewMiddleware(
 			qHandler,
 			middleware.WithSecure(false),
 		)) // get all questions
-	// m.Handle("GET /questions/{slug}") // get question by id
-	// m.Handle("POST /questions") // create a question
-	// m.Handle("POST /questions/answer/{questionId}") // create a answer for a question
-
+	m.Handle("GET /questions/{slug}",
+		middleware.NewMiddleware(
+			qHandler,
+			middleware.WithSecure(false),
+		)) // get question by id
+	m.Handle("POST /questions",
+		middleware.NewMiddleware(
+			qHandler,
+			middleware.WithSecure(false),
+		)) // create a question
+	m.Handle("POST /answers/{questionId}",
+		middleware.NewMiddleware(
+			qHandler,
+			middleware.WithSecure(false),
+		)) // create a answer for a question
 	// m.Handle("GET /")
+	m.Handle("GET /", middleware.NewMiddleware(
+		qHandler,
+		middleware.WithSecure(false),
+	))
 	return m
 }
