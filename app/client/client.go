@@ -3,6 +3,7 @@ package client
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"log/slog"
@@ -11,6 +12,11 @@ import (
 	"time"
 
 	"github.com/Serares/curly-octo-enigma/domain/repo/dto"
+)
+
+var (
+	NotAuthorized = errors.New("Not Authorized")
+	NotFound      = errors.New("Not Found")
 )
 
 type APIEndpoints struct {
@@ -120,5 +126,108 @@ func (c *APIClient) CreateQuestion(questionDto *dto.QuestionDTO, token string) e
 	}
 
 	return nil
+}
 
+func (c *APIClient) ListQuestions(token string) ([]dto.QuestionDTO, error) {
+	var questionsResponse []dto.QuestionDTO
+	resp, err := c.sendRequest(
+		fmt.Sprintf("%s%s", c.BaseUrl, endpoints.CreateQuestion()),
+		http.MethodGet,
+		"application/json",
+		token,
+		http.StatusOK,
+		nil,
+	)
+
+	if err != nil {
+		c.Logger.Error("error requesting the quesitons", "error", err)
+		return nil, err
+	}
+
+	err = json.Unmarshal(resp, &questionsResponse)
+	if err != nil {
+		c.Logger.Error("error listing questions", "error", err)
+		return nil, err
+	}
+
+	return questionsResponse, nil
+}
+
+func (c *APIClient) DeleteQuestionById(questionId, token string) error {
+	_, err := c.sendRequest(
+		fmt.Sprintf("%s%s", c.BaseUrl, endpoints.GetQuestionById(questionId)),
+		http.MethodDelete,
+		"application/json",
+		token,
+		http.StatusOK,
+		nil,
+	)
+
+	if err != nil {
+		c.Logger.Error("error deleting question", "error", err)
+		return err
+	}
+
+	return nil
+}
+
+func (c *APIClient) UpvoteQuestion(questionId, token string) error {
+	_, err := c.sendRequest(
+		fmt.Sprintf("%s%s", c.BaseUrl, endpoints.UpVoteQuestion(questionId)),
+		http.MethodPut,
+		"application/json",
+		token,
+		http.StatusOK,
+		nil,
+	)
+
+	if err != nil {
+		c.Logger.Error("error upvoting question", "error", err)
+		return err
+	}
+
+	return nil
+}
+
+func (c *APIClient) AddAnswer(questionId, answer string, token string) error {
+	// encode the question dto
+	var body bytes.Buffer
+	if err := json.NewEncoder(&body).Encode(answer); err != nil {
+		c.Logger.Error("error encoding answer dto", "error", err)
+		return err
+	}
+
+	_, err := c.sendRequest(
+		fmt.Sprintf("%s%s", c.BaseUrl, endpoints.AddAnswer(questionId)),
+		http.MethodPost,
+		"application/json",
+		token,
+		http.StatusOK,
+		&body,
+	)
+
+	if err != nil {
+		c.Logger.Error("error adding answer", "error", err)
+		return err
+	}
+
+	return nil
+}
+
+func (c *APIClient) UpvoteAnswer(questionId, answerId, token string) error {
+	_, err := c.sendRequest(
+		fmt.Sprintf("%s%s", c.BaseUrl, endpoints.UpVoteAnswer(questionId, answerId)),
+		http.MethodPut,
+		"application/json",
+		token,
+		http.StatusOK,
+		nil,
+	)
+
+	if err != nil {
+		c.Logger.Error("error upvoting answer", "error", err)
+		return err
+	}
+
+	return nil
 }

@@ -40,11 +40,20 @@ func Mux(log *slog.Logger) *http.ServeMux {
 		oidcP,
 	)
 
-	apiClient := client.NewApiClient()
+	apiClient := client.NewApiClient(log)
+
+	qService := services.NewQuestionsService(
+		log,
+		apiClient,
+	)
 
 	m := http.NewServeMux()
 
-	qHandler := handlers.NewQuestionsHandler(log, apiClient)
+	qHandler := handlers.NewQuestionsHandler(
+		log,
+		qService,
+		authService,
+	)
 	authHandler := handlers.NewAuthHandler(log, authService)
 	// views
 	m.Handle("GET /login", authHandler)

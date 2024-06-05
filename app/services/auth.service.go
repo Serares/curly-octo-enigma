@@ -8,6 +8,12 @@ import (
 	"golang.org/x/oauth2"
 )
 
+type UserClaims struct {
+	Sub   string `json:"sub"`
+	Email string `json:"email"`
+	Name  string `json:"name"`
+}
+
 type AuthService struct {
 	Logger    *slog.Logger
 	Oauth2Cfg *oauth2.Config
@@ -45,4 +51,24 @@ func (s *AuthService) Callback(ctx context.Context, queryCode string) (string, e
 	}
 
 	return rawIDToken, nil
+}
+
+// get the token claims
+func (s *AuthService) GetTokenClaims(
+	ctx context.Context,
+	rawIDToken string,
+) (UserClaims, error) {
+	idToken, err := s.OidcP.Verifier(&oidc.Config{ClientID: s.Oauth2Cfg.ClientID}).Verify(ctx, rawIDToken)
+	if err != nil {
+		s.Logger.Error("Failed to verify ID Token", slog.String("error", err.Error()))
+		return UserClaims{}, err
+	}
+
+	var claims UserClaims
+
+	if err := idToken.Claims(&claims); err != nil {
+		return UserClaims{}, err
+	}
+
+	return claims, nil
 }
