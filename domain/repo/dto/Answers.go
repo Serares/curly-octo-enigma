@@ -10,4 +10,5 @@ type AnswerDTO struct {
 	Downvotes  int64     `json:"downvotes"`
 	CreatedAt  time.Time `json:"createdAt"`
 	UpdatedAt  time.Time `json:"updatedAt"`
+	IsAuthor   bool      `json:"isAuthor"` // used to identify the author of the answer
 }

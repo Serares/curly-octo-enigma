@@ -6,4 +6,5 @@ type QuestionDTO struct {
 	Question db.Question `json:"question"`
 	Answers  []db.Answer `json:"answers"`
 	User_ID  string      `json:"user_id"`
+	IsAuthor bool        `json:"isAuthor"` // used to identify the author of the question
 }
