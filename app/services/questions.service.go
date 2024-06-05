@@ -29,6 +29,10 @@ func (s *QuestionsService) ListQuestions(token string) ([]dto.QuestionDTO, error
 	return questions, nil
 }
 
-func (s *QuestionsService) CreateQuestion(questionParams *dto.QuestionDTO, token string) error {
+func (s *QuestionsService) CreateQuestion(questionParams *client.CreateQuestionRequest, token string) error {
 	return s.Client.CreateQuestion(questionParams, token)
+}
+
+func (s *QuestionsService) CreateAnswer() {
+	s.Logger.Error("not implemented")
 }

@@ -103,7 +103,7 @@ func (q *Queries) GetQuestion(ctx context.Context, id string) (Question, error) 
 }
 
 const getQuestionWithAnswers = `-- name: GetQuestionWithAnswers :many
-SELECT q.id, q.created_at, q.updated_at, user_sub, user_name, user_email, q.upvotes, q.downvotes, title, body, a.id, question_id, content, a.upvotes, a.downvotes, a.created_at, a.updated_at
+SELECT q.id, q.created_at, q.updated_at, q.user_sub, user_name, q.user_email, q.upvotes, q.downvotes, title, body, a.id, a.user_sub, a.user_email, question_id, content, a.upvotes, a.downvotes, a.created_at, a.updated_at
 FROM questions q
     LEFT JOIN answers a ON q.id = a.question_id
 WHERE q.id = ?
@@ -122,6 +122,8 @@ type GetQuestionWithAnswersRow struct {
 	Title       string
 	Body        string
 	ID_2        sql.NullString
+	UserSub_2   sql.NullString
+	UserEmail_2 sql.NullString
 	QuestionID  sql.NullString
 	Content     sql.NullString
 	Upvotes_2   sql.NullInt64
@@ -151,6 +153,8 @@ func (q *Queries) GetQuestionWithAnswers(ctx context.Context, id string) ([]GetQ
 			&i.Title,
 			&i.Body,
 			&i.ID_2,
+			&i.UserSub_2,
+			&i.UserEmail_2,
 			&i.QuestionID,
 			&i.Content,
 			&i.Upvotes_2,
@@ -196,16 +200,10 @@ const listQuestions = `-- name: ListQuestions :many
 SELECT id, created_at, updated_at, user_sub, user_name, user_email, upvotes, downvotes, title, body
 FROM questions
 ORDER BY created_at DESC
-LIMIT ? OFFSET ?
 `
 
-type ListQuestionsParams struct {
-	Limit  int64
-	Offset int64
-}
-
-func (q *Queries) ListQuestions(ctx context.Context, arg ListQuestionsParams) ([]Question, error) {
-	rows, err := q.db.QueryContext(ctx, listQuestions, arg.Limit, arg.Offset)
+func (q *Queries) ListQuestions(ctx context.Context) ([]Question, error) {
+	rows, err := q.db.QueryContext(ctx, listQuestions)
 	if err != nil {
 		return nil, err
 	}
@@ -224,6 +222,106 @@ func (q *Queries) ListQuestions(ctx context.Context, arg ListQuestionsParams) ([
 			&i.Downvotes,
 			&i.Title,
 			&i.Body,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listQuestionsWithAnswers = `-- name: ListQuestionsWithAnswers :many
+SELECT q.id,
+    q.title,
+    q.user_sub,
+    a.id
+FROM questions q
+    LEFT JOIN answers a ON q.id = a.id
+ORDER BY q.id,
+    a.id
+`
+
+type ListQuestionsWithAnswersRow struct {
+	ID      string
+	Title   string
+	UserSub string
+	ID_2    sql.NullString
+}
+
+func (q *Queries) ListQuestionsWithAnswers(ctx context.Context) ([]ListQuestionsWithAnswersRow, error) {
+	rows, err := q.db.QueryContext(ctx, listQuestionsWithAnswers)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []ListQuestionsWithAnswersRow
+	for rows.Next() {
+		var i ListQuestionsWithAnswersRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Title,
+			&i.UserSub,
+			&i.ID_2,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listQuestionsWithCounts = `-- name: ListQuestionsWithCounts :many
+SELECT q.id,
+    q.title,
+    q.user_sub,
+    q.created_at,
+    q.upvotes,
+    q.downvotes,
+    COUNT(a.id)
+FROM questions q
+    LEFT JOIN answers a ON q.id = a.id
+ORDER BY q.created_at DESC
+`
+
+type ListQuestionsWithCountsRow struct {
+	ID        string
+	Title     string
+	UserSub   string
+	CreatedAt time.Time
+	Upvotes   int64
+	Downvotes int64
+	Count     int64
+}
+
+func (q *Queries) ListQuestionsWithCounts(ctx context.Context) ([]ListQuestionsWithCountsRow, error) {
+	rows, err := q.db.QueryContext(ctx, listQuestionsWithCounts)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []ListQuestionsWithCountsRow
+	for rows.Next() {
+		var i ListQuestionsWithCountsRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Title,
+			&i.UserSub,
+			&i.CreatedAt,
+			&i.Upvotes,
+			&i.Downvotes,
+			&i.Count,
 		); err != nil {
 			return nil, err
 		}

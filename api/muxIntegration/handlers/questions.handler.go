@@ -10,6 +10,16 @@ import (
 	"github.com/Serares/curly-octo-enigma/utils"
 )
 
+type CreateQuestionRequest struct {
+	Body  string `json:"body"`
+	Title string `json:"title"`
+}
+
+type CreateAnswerRequest struct {
+	Body  string `json:"body"`
+	Title string `json:"title"`
+}
+
 type QuestionsHandler struct {
 	Logger           *slog.Logger
 	QuestionsService *services.QuestionsService

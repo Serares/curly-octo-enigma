@@ -6,12 +6,10 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/Serares/curly-octo-enigma/app/client"
 	"github.com/Serares/curly-octo-enigma/app/middleware"
 	"github.com/Serares/curly-octo-enigma/app/services"
-	"github.com/Serares/curly-octo-enigma/app/utils"
 	"github.com/Serares/curly-octo-enigma/app/views"
-	"github.com/Serares/curly-octo-enigma/domain/repo/db"
-	"github.com/Serares/curly-octo-enigma/domain/repo/dto"
 )
 
 type QuestionsHandler struct {
@@ -39,11 +37,6 @@ func (h *QuestionsHandler) HandleQuestions(
 ) {
 	rawToken := middleware.CheckAuth(r)
 	slug := r.PathValue("slug")
-	userClaims, err := h.AuthService.GetTokenClaims(r.Context(), rawToken)
-	if err != nil {
-		h.Logger.Error("Error trying to get the user claims from the token", "error", err)
-	}
-
 	switch r.Method {
 	case http.MethodGet:
 		if slug == "" {
@@ -64,14 +57,22 @@ func (h *QuestionsHandler) HandleQuestions(
 		questionTitle := r.FormValue("question_title")
 
 		err := h.QuestionsService.CreateQuestion(
-			&dto.QuestionDTO{
-				Question: db.Question{
-					Body:  questionBody,
-					Title: questionTitle,
-				},
+			&client.CreateQuestionRequest{
+				Body:  questionBody,
+				Title: questionTitle,
 			},
 			rawToken,
 		)
+		if err != nil {
+			viewQuestions(
+				w,
+				r,
+				views.QuestionsProps{
+					Error: err.Error(),
+				},
+			)
+			return
+		}
 		allQuestions, err := h.QuestionsService.ListQuestions(
 			rawToken,
 		)
@@ -82,7 +83,6 @@ func (h *QuestionsHandler) HandleQuestions(
 			views.QuestionsProps{
 				Questions: allQuestions,
 				Error:     err.Error(),
-				IsAuthor:  utils.CheckIfAuthor(&userClaims, allQuestions[0].Question.UserSub),
 			},
 		)
 

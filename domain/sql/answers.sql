@@ -2,13 +2,15 @@
 INSERT INTO answers (
         id,
         question_id,
+        user_sub,
+        user_email,
         content,
         upvotes,
         downvotes,
         created_at,
         updated_at
     )
-VALUES(?, ?, ?, ?, ?, ?, ?);
+VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?);
 -- name: DeleteAnswer :exec
 DELETE FROM answers
 WHERE id = ?;

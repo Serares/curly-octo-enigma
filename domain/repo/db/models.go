@@ -10,6 +10,8 @@ import (
 
 type Answer struct {
 	ID         string
+	UserSub    string
+	UserEmail  string
 	QuestionID string
 	Content    string
 	Upvotes    int64

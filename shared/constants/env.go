@@ -2,6 +2,7 @@ package constants
 
 const (
 	ENV_KEY_IS_DB_LOCAL       = "IS_DB_LOCAL"
+	ENV_KEY_DB_FILE           = "DB_FILE"
 	ENV_KEY_IS_LOCAL          = "IS_LOCAL"
 	ENV_KEY_TURSO_DB_PORT     = "TURSO_DB_PORT"
 	ENV_KEY_TURSO_DB_TOKEN    = "TURSO_DB_TOKEN"

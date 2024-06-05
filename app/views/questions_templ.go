@@ -129,7 +129,7 @@ func Questions(props QuestionsProps) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"row\"><p>Questions List</p></div><div class=\"row\"><div class=\"col-md-4\"><p>Add question</p><form hx-post=\"/questions\" hx-target=\"#questions-list\" hx-swap=\"innerHTML\"><div class=\"mb-3\"><label for=\"question_title\" class=\"form-label\">Question:</label> <input type=\"text\" class=\"form-control\" id=\"question_title\" name=\"question_title\" rows=\"3\" required> <label for=\"question_body\" class=\"form-label\">Question:</label> <input type=\"text\" class=\"form-control\" id=\"question_body\" name=\"question_body\" rows=\"3\" required> <button type=\"submit\" class=\"btn btn-primary\">Add Question</button></div></form></div><div id=\"questions-list\" class=\"col-md-6\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"row\"><p>Questions List</p></div><div class=\"row\"><div class=\"col-md-4\"><p>Add question</p><form hx-post=\"/questions\" hx-target=\"#questions-list\" hx-swap=\"innerHTML\"><div class=\"mb-3\"><label for=\"question_title\" class=\"form-label\">Title:</label> <input type=\"text\" class=\"form-control\" id=\"question_title\" name=\"question_title\" rows=\"3\" required> <label for=\"question_body\" class=\"form-label\">Question:</label> <input type=\"text\" class=\"form-control\" id=\"question_body\" name=\"question_body\" rows=\"3\" required> <button type=\"submit\" class=\"btn btn-primary\">Add Question</button></div></form></div><div id=\"questions-list\" class=\"col-md-6\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

@@ -28,6 +28,7 @@ func NewSqliteQuestionsRepository() (*SqliteQuestionsRepository, error) {
 	}
 	dbConn, err := sql.Open("libsql", dbUrl)
 	if err != nil {
+		fmt.Println("the db url:", dbUrl)
 		return nil, err
 	}
 	dbConn.SetConnMaxIdleTime(30 * time.Minute)
@@ -42,9 +43,42 @@ func NewSqliteQuestionsRepository() (*SqliteQuestionsRepository, error) {
 	}, nil
 }
 
-func (s *SqliteQuestionsRepository) ListAllQuestions(ctx context.Context, limit int64, offset int64) ([]dto.QuestionDTO, error) {
-	// should be a lean dto object
-	return nil, errors.New("Not implemented")
+// returns a general list of questions
+func (s *SqliteQuestionsRepository) ListAllQuestions(ctx context.Context) ([]dto.QuestionDTO, error) {
+	dbQuestions, err := s.db.ListQuestionsWithCounts(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	dtoQuestions := make([]dto.QuestionDTO, 0)
+
+	if len(dbQuestions) < 1 {
+		return nil, errors.New("no questions found")
+	}
+
+	for _, q := range dbQuestions {
+		dto := dto.QuestionDTO{
+			Question: db.Question{
+				ID:        q.ID,
+				CreatedAt: q.CreatedAt,
+				UpdatedAt: time.Time{},
+				UserSub:   q.UserSub,
+				UserName:  "",
+				UserEmail: "",
+				Upvotes:   q.Upvotes,
+				Downvotes: q.Downvotes,
+				Title:     q.Title,
+				Body:      "",
+			},
+			Answers:      []db.Answer{},
+			AnswersCount: q.Count,
+			User_ID:      q.UserSub,
+			IsAuthor:     false, // this has to be populated in service
+		}
+		dtoQuestions = append(dtoQuestions, dto)
+	}
+
+	return dtoQuestions, nil
 }
 
 func (s *SqliteQuestionsRepository) FindQuestionById(ctx context.Context, id string) (dto.QuestionDTO, error) {
@@ -91,7 +125,7 @@ func (s *SqliteQuestionsRepository) FindQuestionById(ctx context.Context, id str
 	return dto, nil
 }
 
-func (s *SqliteQuestionsRepository) CreateQuestion(question *dto.QuestionDTO) error {
+func (s *SqliteQuestionsRepository) CreateQuestion(ctx context.Context, question *dto.QuestionDTO) error {
 	params := db.CreateQuestionParams{
 		ID:        question.Question.ID,
 		CreatedAt: time.Now().UTC(),
@@ -105,20 +139,19 @@ func (s *SqliteQuestionsRepository) CreateQuestion(question *dto.QuestionDTO) er
 		Downvotes: 0,
 	}
 
-	return s.db.CreateQuestion(context.Background(), params)
+	return s.db.CreateQuestion(ctx, params)
 }
 
-func (s *SqliteQuestionsRepository) UpdateQuestion(question *dto.QuestionDTO) error {
-	return errors.New("Not implemented")
+func (s *SqliteQuestionsRepository) UpdateQuestion(ctx context.Context, question *dto.QuestionDTO) error {
+	return errors.New("not implemented")
 }
 
-func (s *SqliteQuestionsRepository) DeleteQuestionById(id string) error {
-	return errors.New("Not implemented")
+func (s *SqliteQuestionsRepository) DeleteQuestionById(ctx context.Context, id string) error {
+	return s.db.DeleteQuestion(ctx, id)
 }
 
 // answers
-
-func (s *SqliteQuestionsRepository) AddAnswer(questionId string, answerParams *dto.AnswerDTO) error {
+func (s *SqliteQuestionsRepository) AddAnswer(ctx context.Context, questionId string, answerParams *dto.AnswerDTO) error {
 	dbParams := db.CreateAnswerParams{
 		ID:         answerParams.Id,
 		CreatedAt:  time.Now().UTC(),
@@ -131,10 +164,18 @@ func (s *SqliteQuestionsRepository) AddAnswer(questionId string, answerParams *d
 	return s.db.CreateAnswer(context.Background(), dbParams)
 }
 
-func (s *SqliteQuestionsRepository) RemoveAnswer(questionId string, answerId string) error {
-	return errors.New("Not implemented")
+func (s *SqliteQuestionsRepository) RemoveAnswer(ctx context.Context, answerId string) error {
+	return s.db.DeleteAnswer(ctx, answerId)
 }
 
-func (s *SqliteQuestionsRepository) UpdateAnswer(questionId string, answerParams dto.AnswerDTO) error {
-	return errors.New("Not implemented")
+func (s *SqliteQuestionsRepository) UpdateAnswer(ctx context.Context, answerParams dto.AnswerDTO) error {
+	return errors.New("not implemented")
+}
+
+func (s *SqliteQuestionsRepository) DownvoteAnswer(ctx context.Context, answerId string) error {
+	return errors.New("not implemented")
+}
+
+func (s *SqliteQuestionsRepository) UpvoteAnswer(ctx context.Context, asnwerId string) error {
+	return errors.New("not implemented")
 }

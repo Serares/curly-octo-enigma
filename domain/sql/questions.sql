@@ -20,8 +20,7 @@ LIMIT 1;
 -- name: ListQuestions :many
 SELECT *
 FROM questions
-ORDER BY created_at DESC
-LIMIT ? OFFSET ?;
+ORDER BY created_at DESC;
 -- name: UpdateQuestion :exec
 UPDATE questions
 SET updated_at = ?,
@@ -53,3 +52,23 @@ FROM questions q
     LEFT JOIN answers a ON q.id = a.question_id
 WHERE q.id = ?
 ORDER BY a.created_at DESC;
+-- name: ListQuestionsWithAnswers :many
+SELECT q.id,
+    q.title,
+    q.user_sub,
+    a.id
+FROM questions q
+    LEFT JOIN answers a ON q.id = a.id
+ORDER BY q.id,
+    a.id;
+-- name: ListQuestionsWithCounts :many
+SELECT q.id,
+    q.title,
+    q.user_sub,
+    q.created_at,
+    q.upvotes,
+    q.downvotes,
+    COUNT(a.id)
+FROM questions q
+    LEFT JOIN answers a ON q.id = a.id
+ORDER BY q.created_at DESC;

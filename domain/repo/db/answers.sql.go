@@ -14,18 +14,22 @@ const createAnswer = `-- name: CreateAnswer :exec
 INSERT INTO answers (
         id,
         question_id,
+        user_sub,
+        user_email,
         content,
         upvotes,
         downvotes,
         created_at,
         updated_at
     )
-VALUES(?, ?, ?, ?, ?, ?, ?)
+VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)
 `
 
 type CreateAnswerParams struct {
 	ID         string
 	QuestionID string
+	UserSub    string
+	UserEmail  string
 	Content    string
 	Upvotes    int64
 	Downvotes  int64
@@ -37,6 +41,8 @@ func (q *Queries) CreateAnswer(ctx context.Context, arg CreateAnswerParams) erro
 	_, err := q.db.ExecContext(ctx, createAnswer,
 		arg.ID,
 		arg.QuestionID,
+		arg.UserSub,
+		arg.UserEmail,
 		arg.Content,
 		arg.Upvotes,
 		arg.Downvotes,
@@ -68,7 +74,7 @@ func (q *Queries) DownvoteAnswer(ctx context.Context, id string) error {
 }
 
 const getAnswer = `-- name: GetAnswer :one
-SELECT id, question_id, content, upvotes, downvotes, created_at, updated_at
+SELECT id, user_sub, user_email, question_id, content, upvotes, downvotes, created_at, updated_at
 FROM answers
 WHERE id = ?
 LIMIT 1
@@ -79,6 +85,8 @@ func (q *Queries) GetAnswer(ctx context.Context, id string) (Answer, error) {
 	var i Answer
 	err := row.Scan(
 		&i.ID,
+		&i.UserSub,
+		&i.UserEmail,
 		&i.QuestionID,
 		&i.Content,
 		&i.Upvotes,
@@ -90,7 +98,7 @@ func (q *Queries) GetAnswer(ctx context.Context, id string) (Answer, error) {
 }
 
 const getAnswersByQuestionID = `-- name: GetAnswersByQuestionID :many
-SELECT id, question_id, content, upvotes, downvotes, created_at, updated_at
+SELECT id, user_sub, user_email, question_id, content, upvotes, downvotes, created_at, updated_at
 FROM answers
 WHERE question_id = ?
 ORDER BY created_at DESC
@@ -107,6 +115,8 @@ func (q *Queries) GetAnswersByQuestionID(ctx context.Context, questionID string)
 		var i Answer
 		if err := rows.Scan(
 			&i.ID,
+			&i.UserSub,
+			&i.UserEmail,
 			&i.QuestionID,
 			&i.Content,
 			&i.Upvotes,
@@ -128,7 +138,7 @@ func (q *Queries) GetAnswersByQuestionID(ctx context.Context, questionID string)
 }
 
 const listAnswers = `-- name: ListAnswers :many
-SELECT id, question_id, content, upvotes, downvotes, created_at, updated_at
+SELECT id, user_sub, user_email, question_id, content, upvotes, downvotes, created_at, updated_at
 FROM answers
 ORDER BY created_at DESC
 `
@@ -144,6 +154,8 @@ func (q *Queries) ListAnswers(ctx context.Context) ([]Answer, error) {
 		var i Answer
 		if err := rows.Scan(
 			&i.ID,
+			&i.UserSub,
+			&i.UserEmail,
 			&i.QuestionID,
 			&i.Content,
 			&i.Upvotes,

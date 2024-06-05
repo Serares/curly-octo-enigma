@@ -21,26 +21,40 @@ var (
 
 type APIEndpoints struct {
 	CreateQuestion   func() string
+	ListQuestions    func() string
 	UpVoteQuestion   func(questionId string) string
 	DownVoteQuestion func(questionId string) string
 	GetQuestionById  func(qestionId string) string
 	AddAnswer        func(questionId string) string
-	UpVoteAnswer     func(questionId, answerId string) string
-	DownVoteAnswer   func(questionId, answerId string) string
+	DeleteAnswer     func(answerId string) string
+	UpVoteAnswer     func(answerId string) string
+	DownVoteAnswer   func(answerId string) string
 }
 
 var endpoints = APIEndpoints{
 	CreateQuestion:   func() string { return "/questions" },
+	ListQuestions:    func() string { return "/questions" },
 	GetQuestionById:  func(questionId string) string { return fmt.Sprintf("/questions/%s", questionId) },
 	UpVoteQuestion:   func(questionId string) string { return fmt.Sprintf("/questions/upvote/%s", questionId) },
 	DownVoteQuestion: func(questionId string) string { return fmt.Sprintf("/questions/downvote/%s", questionId) },
-	AddAnswer:        func(questionId string) string { return fmt.Sprintf("/questions/addAnswer/%s", questionId) },
-	UpVoteAnswer: func(questionId, answerId string) string {
-		return fmt.Sprintf("/answers?questionId=%s&answerId=%s", questionId, answerId)
+	AddAnswer:        func(questionId string) string { return fmt.Sprintf("/answers/%s", questionId) },
+	DeleteAnswer:     func(answerId string) string { return fmt.Sprintf("/answers/%s", answerId) },
+	UpVoteAnswer: func(answerId string) string {
+		return fmt.Sprintf("/answers/%s", answerId)
 	},
-	DownVoteAnswer: func(questionId, answerId string) string {
-		return fmt.Sprintf("/answers?questionId=%s&answerId=%s", questionId, answerId)
+	DownVoteAnswer: func(answerId string) string {
+		return fmt.Sprintf("/answers%s", answerId)
 	},
+}
+
+type CreateQuestionRequest struct {
+	Body  string `json:"body"`
+	Title string `json:"title"`
+}
+
+type CreateAnswerRequest struct {
+	Body  string `json:"body"`
+	Title string `json:"title"`
 }
 
 // used to interact with gw api
@@ -103,10 +117,10 @@ func (ssrc *APIClient) sendRequest(
 	return msg, nil
 }
 
-func (c *APIClient) CreateQuestion(questionDto *dto.QuestionDTO, token string) error {
+func (c *APIClient) CreateQuestion(questionParams *CreateQuestionRequest, token string) error {
 	// encode the question dto
 	var body bytes.Buffer
-	if err := json.NewEncoder(&body).Encode(questionDto); err != nil {
+	if err := json.NewEncoder(&body).Encode(questionParams); err != nil {
 		c.Logger.Error("error encoding question dto", "error", err)
 		return err
 	}
@@ -131,7 +145,7 @@ func (c *APIClient) CreateQuestion(questionDto *dto.QuestionDTO, token string) e
 func (c *APIClient) ListQuestions(token string) ([]dto.QuestionDTO, error) {
 	var questionsResponse []dto.QuestionDTO
 	resp, err := c.sendRequest(
-		fmt.Sprintf("%s%s", c.BaseUrl, endpoints.CreateQuestion()),
+		fmt.Sprintf("%s%s", c.BaseUrl, endpoints.ListQuestions()),
 		http.MethodGet,
 		"application/json",
 		token,
@@ -189,10 +203,10 @@ func (c *APIClient) UpvoteQuestion(questionId, token string) error {
 	return nil
 }
 
-func (c *APIClient) AddAnswer(questionId, answer string, token string) error {
+func (c *APIClient) AddAnswer(questionId string, answerParams CreateAnswerRequest, token string) error {
 	// encode the question dto
 	var body bytes.Buffer
-	if err := json.NewEncoder(&body).Encode(answer); err != nil {
+	if err := json.NewEncoder(&body).Encode(answerParams); err != nil {
 		c.Logger.Error("error encoding answer dto", "error", err)
 		return err
 	}
@@ -216,7 +230,7 @@ func (c *APIClient) AddAnswer(questionId, answer string, token string) error {
 
 func (c *APIClient) UpvoteAnswer(questionId, answerId, token string) error {
 	_, err := c.sendRequest(
-		fmt.Sprintf("%s%s", c.BaseUrl, endpoints.UpVoteAnswer(questionId, answerId)),
+		fmt.Sprintf("%s%s", c.BaseUrl, endpoints.UpVoteAnswer(answerId)),
 		http.MethodPut,
 		"application/json",
 		token,

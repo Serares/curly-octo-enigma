@@ -77,6 +77,12 @@ func Mux(log *slog.Logger) *http.ServeMux {
 			middleware.WithSecure(false),
 		))
 	// create a answer for a question
+	m.Handle("DELETE /answers/{id}",
+		middleware.NewMiddleware(
+			qHandler,
+			middleware.WithSecure(false),
+		))
+	// create a answer for a question
 	m.Handle("POST /answers/{questionId}",
 		middleware.NewMiddleware(
 			qHandler,

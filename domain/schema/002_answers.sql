@@ -1,6 +1,8 @@
 -- +goose Up
 CREATE TABLE IF NOT EXISTS answers (
     id TEXT PRIMARY KEY NOT NULL,
+    user_sub TEXT NOT NULL,
+    user_email TEXT NOT NULL,
     question_id TEXT NOT NULL,
     content TEXT NOT NULL,
     upvotes INTEGER NOT NULL,

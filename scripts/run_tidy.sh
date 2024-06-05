@@ -1,7 +1,7 @@
 #! /bin/bash
 
 # Array of directories where your Go modules are located
-declare -a goModuleDirs=("app/" "infra/" "domain/repo/")
+declare -a goModuleDirs=("app/" "utils/" "infra/" "domain/repo/" "api/*")
 
 for path in "${goModuleDirs[@]}"; do
     # Loop through each directory
