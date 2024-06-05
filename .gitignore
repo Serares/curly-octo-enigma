@@ -33,4 +33,3 @@ yarn-error.log*
 /**/__debug_bin*
 
 # used for running the local db
-data/*
